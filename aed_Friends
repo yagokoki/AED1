@@ -1,0 +1,165 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#define MAX 100
+
+struct no {
+    char nome[MAX];
+    struct no *prox;
+
+};
+
+typedef struct no *no;
+
+//essa função cria o primeiro no da lista
+no cria_no(char *ainserir, int tam){
+    no novoNo = (no) malloc(sizeof(struct no));
+    int i;
+    for (i = 0; i < tam; i++){
+        novoNo->nome[i] = ainserir[i];
+    }
+    novoNo->nome[i] = '\0';
+    novoNo->prox = NULL;
+    return novoNo;
+}
+
+//essa função insere um valor no nó e passa para o próximo
+no insere_no(no raiz, char *ainserir, int tam){
+    //só insere no final
+    no aux = raiz;
+    int i;
+    //criam o barco
+    no novoNo = (no) malloc(sizeof(struct no));
+    for (i = 0; i < tam; i++){
+        novoNo->nome[i] = ainserir[i];
+    }
+    novoNo->nome[i] = '\0';
+    novoNo->prox = NULL;
+    
+    //navega pro último
+    while (aux->prox != NULL){
+        aux = aux->prox;
+    }
+
+    //faz a ponte
+    aux->prox = novoNo;
+
+    return raiz;
+}
+//lê a string por inteiro e divide as palavras e as envia para a função cria_no ou insere_no
+no busca(no raiz, char *aquebrar){
+    int i, j;
+    i = 0;
+    int criado = 0;
+    for (j = 0; j < MAX; j++){
+        char aux = aquebrar[j];
+        if (aux == ' ' || aux == '\0'){
+            if(criado == 0){
+                raiz = cria_no(aquebrar + i, j-i);
+                i = j;
+                criado = 1;
+                if(aux == '\0') break;
+            } else {
+                raiz = insere_no(raiz, aquebrar + i + 1, j-i-1);
+                i = j;
+                if(aux == '\0') break;
+            }
+        }
+    }
+
+    return raiz;
+}
+
+//imprime a lista atualizada
+void printa(no raiz){
+    no aux = raiz;
+    for (aux = raiz; aux != NULL; aux = aux->prox) {
+        if(aux->prox == NULL){
+            printf("%s", aux->nome);
+        }
+        else{
+        printf("%s ", aux->nome);
+        }
+    }
+        printf("\n");
+}
+
+//faz com que o último nó da primeira lista aponte para o primeiro nó da segunda
+no conectafim(no raiz, no raiz2){
+    no aux = raiz;
+    while (aux->prox != NULL){
+        aux = aux->prox;
+    }
+    aux->prox = raiz2;
+
+    return raiz;
+}
+
+//limpa os nós no final do programa
+void limpa(no raiz){
+    no aux = raiz;
+    no aux2 = raiz->prox;
+    while(aux2 != NULL){
+        free(aux);
+        aux = aux2;
+        aux2 = aux2->prox;
+    }
+}
+
+//essa função conecta as listas e envia tudo a partir do elemento selecionado para o final da lista atualizada
+no conectaelemento(no raiz, no raiz2, char *elemento){
+    
+    no aux = raiz;
+    no aux2;
+    int retorno = (int) strcmp(aux->nome, elemento);
+    if(retorno == 0) return conectafim(raiz2, raiz);
+    while(retorno != 0){
+        retorno = (int) strcmp(aux->prox->nome, elemento);
+        if(retorno == 0) break;
+        aux = aux->prox;
+    }
+
+    
+    conectafim(raiz2, aux->prox);
+    aux->prox = raiz2;
+
+    return raiz;
+}
+int main(){
+    no raiz =  NULL;
+    no raiz2 = NULL;
+    char nome_temp[MAX];
+    char nome_novo[MAX];
+    char elemento[MAX];
+    int retorno;
+    retorno = 0;
+    
+    fgets(nome_temp, MAX, stdin);
+    int aux = strlen(nome_temp);
+    nome_temp[aux-1] = '\0';
+    raiz = busca(raiz, nome_temp);
+
+    //recebe a lista antiga
+    fgets(nome_novo, MAX, stdin);
+    aux = strlen(nome_novo);
+    nome_novo[aux-1] = '\0';
+    raiz2 = busca(raiz2, nome_novo); 
+    
+    // recebe a lista nova de amigos
+    fgets(elemento, MAX, stdin);
+    aux = strlen(elemento);
+    elemento[aux-1] = '\0';
+    // recebe onde vai quebrar a lista antiga, caso receba "não" apenas coloca a lista nova em seguida
+    retorno = (int) strcmp(elemento, "nao");
+
+    if (retorno == 0){
+        raiz = conectafim(raiz, raiz2);
+    } else {
+        raiz = conectaelemento(raiz, raiz2, elemento);
+    }
+    
+    printa(raiz);
+    limpa(raiz);    
+
+    return 0;
+}
