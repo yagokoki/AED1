@@ -13,7 +13,7 @@ void Insercao(int n, int v[]) {
 }
 
 int main(void) {
-  int n, i, j, k;
+  int n, i, j;
   clock_t tinicial, tfinal;
   double tempo;
   double tempomili;
